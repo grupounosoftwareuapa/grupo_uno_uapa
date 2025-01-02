@@ -3,18 +3,13 @@ package com.uapa.software.repositories;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import com.uapa.software.utils.HibernateUtil;
-
 public class GenericRepository<Entity> implements IRepository<Entity> {
 
-	Session session = HibernateUtil.getSessionFactory().openSession();
+	Session session = null;// HibernateUtil.getSessionFactory().openSession();
 	Transaction transaction = null;
 
 	@Override
@@ -88,7 +83,7 @@ public class GenericRepository<Entity> implements IRepository<Entity> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Entity> getEntities(String className) {
-		List<Entity> entities = new ArrayList<Entity>();
+		List<Entity> entities = new ArrayList<>();
 
 		try {
 			Class<?> clazz = Class.forName(className);
@@ -105,6 +100,11 @@ public class GenericRepository<Entity> implements IRepository<Entity> {
 			System.out.println("Error when creating entity:: " + ex.getMessage());
 		}
 		return entities;
+
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
 	}
 
 }

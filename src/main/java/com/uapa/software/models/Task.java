@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
-	
+
 	private int id;
 	private String name;
 	private String status;
@@ -20,5 +20,5 @@ public class Task {
 	private Project project;
 	private Date startDate;
 	private Date endDate;
-	
+
 }
