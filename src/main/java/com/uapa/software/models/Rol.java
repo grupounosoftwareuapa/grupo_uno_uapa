@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Rol {
-	
+
 	private int id;
 	private String name;
-	
+
 }

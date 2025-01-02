@@ -3,9 +3,6 @@ package com.uapa.software.repositories;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -88,7 +85,7 @@ public class GenericRepository<Entity> implements IRepository<Entity> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Entity> getEntities(String className) {
-		List<Entity> entities = new ArrayList<Entity>();
+		List<Entity> entities = new ArrayList<>();
 
 		try {
 			Class<?> clazz = Class.forName(className);
