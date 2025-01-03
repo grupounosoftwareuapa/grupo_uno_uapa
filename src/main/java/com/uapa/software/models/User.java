@@ -16,22 +16,17 @@ import lombok.Setter;
 @Table(name = "tbl_user")
 public class User {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+    private int id;
 
-	@Column(name = "user_name", nullable = false)
-	private String userName;
-	
+    @Column(name = "user_name", nullable = false)
+    private String userName;
+
     @Column(name = "password", nullable = false)
-	private String password;
-	@ManyToMany
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-	private List<Rol> roles;
-
+    private String password;
+    @ManyToMany
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Rol> roles;
 
 }

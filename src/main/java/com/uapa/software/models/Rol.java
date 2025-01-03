@@ -20,10 +20,10 @@ import lombok.Setter;
 public class Rol {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
-    @Column(name = "name", nullable = false)
+
+	@Column(name = "name", nullable = false)
 	private String name;
 
 }
