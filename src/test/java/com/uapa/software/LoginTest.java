@@ -8,7 +8,6 @@ import com.uapa.software.views.Login;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,67 +18,89 @@ public class LoginTest {
 
 	@BeforeEach
 	public void setUp() {
+		if (GraphicsEnvironment.isHeadless()) {
+			System.out.println("Running in headless mode");
+		} else {
+			System.out.println("Running with graphical environment");
+		}
+
 		login = new Login();
-		login.setVisible(true); // Ensure the JFrame is visible for testing
+		login.setVisible(!GraphicsEnvironment.isHeadless()); // Only set visible if not headless
 	}
 
 	@Test
-	public void testLoginWithValidCredentials() throws Exception {
+	public void testLoginWithValidCredentials() {
 		// Mock JOptionPane
 		try (MockedStatic<JOptionPane> mockedJOptionPane = mockStatic(JOptionPane.class)) {
-			// Use reflection to access private fields
-			JTextField txtUsername = getField(login, "txtUsername", JTextField.class);
-			JPasswordField txtPassword = getField(login, "txtPassword", JPasswordField.class);
+			// Locate components
+			JTextField txtUsername = findComponent(login.getContentPane(), JTextField.class);
+			JPasswordField txtPassword = findComponent(login.getContentPane(), JPasswordField.class);
+			JButton btnLogin = findButton(login.getContentPane(), "Login");
 
-			// Simulate user input
+			assertNotNull(txtUsername, "Username field not found");
+			assertNotNull(txtPassword, "Password field not found");
+			assertNotNull(btnLogin, "Login button not found");
+
+			// Simulate valid user input
 			txtUsername.setText("admin");
 			txtPassword.setText("password");
 
 			// Trigger login button click
-			JButton btnLogin = findButton(login, "Login");
-			assertNotNull(btnLogin, "Login button not found");
 			btnLogin.doClick();
 
-			// Verify that no error dialog is shown
+			// Verify no error dialog is shown
 			mockedJOptionPane.verify(() -> JOptionPane.showMessageDialog(any(), eq("Credenciales incorrectas"),
 					eq("Error"), eq(JOptionPane.ERROR_MESSAGE)), never());
 		}
 	}
 
 	@Test
-	public void testLoginWithInvalidCredentials() throws Exception {
+	public void testLoginWithInvalidCredentials() {
 		// Mock JOptionPane
 		try (MockedStatic<JOptionPane> mockedJOptionPane = mockStatic(JOptionPane.class)) {
-			// Use reflection to access private fields
-			JTextField txtUsername = getField(login, "txtUsername", JTextField.class);
-			JPasswordField txtPassword = getField(login, "txtPassword", JPasswordField.class);
+			// Locate components
+			JTextField txtUsername = findComponent(login.getContentPane(), JTextField.class);
+			JPasswordField txtPassword = findComponent(login.getContentPane(), JPasswordField.class);
+			JButton btnLogin = findButton(login.getContentPane(), "Login");
 
-			// Simulate user input
+			assertNotNull(txtUsername, "Username field not found");
+			assertNotNull(txtPassword, "Password field not found");
+			assertNotNull(btnLogin, "Login button not found");
+
+			// Simulate invalid user input
 			txtUsername.setText("user");
 			txtPassword.setText("wrong");
 
 			// Trigger login button click
-			JButton btnLogin = findButton(login, "Login");
-			assertNotNull(btnLogin, "Login button not found");
 			btnLogin.doClick();
 
-			// Verify that the error dialog is shown
+			// Verify error dialog is shown
 			mockedJOptionPane.verify(() -> JOptionPane.showMessageDialog(any(), eq("Credenciales incorrectas"),
 					eq("Error"), eq(JOptionPane.ERROR_MESSAGE)));
 		}
 	}
 
 	/**
-	 * Utility method to use reflection to get a private field.
+	 * Utility method to find a component of a specific type in a container
+	 * hierarchy.
 	 */
-	private <T> T getField(Object object, String fieldName, Class<T> fieldType) throws Exception {
-		Field field = object.getClass().getDeclaredField(fieldName);
-		field.setAccessible(true); // Allow access to private fields
-		return fieldType.cast(field.get(object));
+	private <T> T findComponent(Container container, Class<T> componentClass) {
+		for (Component component : container.getComponents()) {
+			if (componentClass.isInstance(component)) {
+				return componentClass.cast(component);
+			}
+			if (component instanceof Container) {
+				T found = findComponent((Container) component, componentClass);
+				if (found != null) {
+					return found;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
-	 * Utility method to find a button by its text.
+	 * Utility method to find a button by its text in a container hierarchy.
 	 */
 	private JButton findButton(Container container, String buttonText) {
 		for (Component component : container.getComponents()) {
@@ -90,9 +111,9 @@ public class LoginTest {
 				}
 			}
 			if (component instanceof Container) {
-				JButton button = findButton((Container) component, buttonText);
-				if (button != null) {
-					return button;
+				JButton found = findButton((Container) component, buttonText);
+				if (found != null) {
+					return found;
 				}
 			}
 		}
