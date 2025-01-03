@@ -7,11 +7,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import com.uapa.software.utils.HibernateUtil;
-
 public class GenericRepository<Entity> implements IRepository<Entity> {
 
-	Session session = HibernateUtil.getSessionFactory().openSession();
+	Session session = null;// HibernateUtil.getSessionFactory().openSession();
 	Transaction transaction = null;
 
 	@Override
@@ -102,6 +100,11 @@ public class GenericRepository<Entity> implements IRepository<Entity> {
 			System.out.println("Error when creating entity:: " + ex.getMessage());
 		}
 		return entities;
+
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
 	}
 
 }
