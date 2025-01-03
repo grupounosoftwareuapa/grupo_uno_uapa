@@ -3,10 +3,10 @@ name: Java Maven CI
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-test:
@@ -33,6 +33,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 4: Run Maven tests
+      # Step 4: Set up environment variables
+      - name: Load environment variables
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            cp .env.test .env
+          else
+            cp .env .env
+          fi
+
+      # Step 5: Run Maven tests
       - name: Build and Test
         run: mvn clean test
