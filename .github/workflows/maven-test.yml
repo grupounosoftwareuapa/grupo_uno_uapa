@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: "11"
-          distribution: "temurin" # Opciones: temurin, zulu, adopt, etc.
+          distribution: "temurin" # Options: temurin, zulu, adopt, etc.
 
       # Step 3: Cache Maven dependencies
       - name: Cache Maven dependencies
@@ -33,7 +33,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Step 4: Set up environment variables
+      # Step 4: Set up Xvfb for GUI support
+      - name: Install and start Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          Xvfb :99 -screen 0 1920x1080x24 &
+        env:
+          DISPLAY: ":99"
+
+      # Step 5: Set up environment variables
       - name: Load environment variables
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -42,6 +51,8 @@ jobs:
             cp .env .env
           fi
 
-      # Step 5: Run Maven tests
+      # Step 6: Run Maven tests
       - name: Build and Test
         run: mvn clean test
+        env:
+          DISPLAY: ":99"
