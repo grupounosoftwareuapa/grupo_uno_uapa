@@ -46,9 +46,13 @@ jobs:
       - name: Load environment variables
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Using .env.test"
             cp .env.test .env
+          elif [ -f .env.production ]; then
+            echo "Using .env.production"
+            cp .env.production .env
           else
-            cp .env .env
+            echo ".env file already exists, skipping copy"
           fi
 
       # Step 6: Run Maven tests
