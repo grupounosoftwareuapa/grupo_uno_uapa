@@ -3,8 +3,8 @@ package com.uapa.software.utils;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 
 import com.uapa.software.models.Project;
 import com.uapa.software.models.Rol;
@@ -22,13 +22,13 @@ public class HibernateTestUtil {
                 Configuration configuration = new Configuration();
 
                 Properties settings = new Properties();
-                settings.put(Environment.DRIVER, "org.h2.Driver");
-                settings.put(Environment.URL, "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-                settings.put(Environment.USER, "sa");
-                settings.put(Environment.PASS, "");
-                settings.put(Environment.DIALECT, "org.hibernate.dialect.H2Dialect");
-                settings.put(Environment.SHOW_SQL, "true");
-                settings.put(Environment.HBM2DDL_AUTO, "create-drop");
+                settings.put(AvailableSettings.DRIVER, "org.h2.Driver");
+                settings.put(AvailableSettings.URL, "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+                settings.put(AvailableSettings.USER, "sa");
+                settings.put(AvailableSettings.PASS, "");
+                settings.put(AvailableSettings.DIALECT, "org.hibernate.dialect.H2Dialect");
+                settings.put(AvailableSettings.SHOW_SQL, "true");
+                settings.put(AvailableSettings.HBM2DDL_AUTO, "create-drop");
 
                 configuration.setProperties(settings);
 

@@ -110,7 +110,7 @@ public class Login extends JFrame {
 
         // Lógica de inicio de sesión (ejemplo simple)
         if (username.equals("admin") && password.equals("password")) {
-        	
+
         } else {
             JOptionPane.showMessageDialog(this, "Credenciales incorrectas", "Error", JOptionPane.ERROR_MESSAGE);
         }

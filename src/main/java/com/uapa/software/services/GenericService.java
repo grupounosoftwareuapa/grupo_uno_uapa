@@ -6,7 +6,7 @@ import com.uapa.software.repositories.GenericRepository;
 
 public class GenericService<Entity> implements ICRUD<Entity> {
 
-	private GenericRepository<Entity> genericRepository = new GenericRepository<Entity>();
+	private GenericRepository<Entity> genericRepository = new GenericRepository<>();
 
 	@Override
 	public Entity save(Entity entity) {

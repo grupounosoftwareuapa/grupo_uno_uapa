@@ -4,150 +4,177 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.junit.jupiter.api.AfterEach;
+import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.uapa.software.models.Rol;
-import com.uapa.software.models.User;
 import com.uapa.software.repositories.GenericRepository;
-import com.uapa.software.utils.HibernateTestUtil;
 
 class GenericRepositoryTest {
 
-	private GenericRepository<User> repository;
-	private Session session;
+    private GenericRepository<Object> repository;
+    private Session sessionMock;
+    private Transaction transactionMock;
 
-	@BeforeEach
-	void setUp() {
-		session = HibernateTestUtil.getSessionFactory().openSession();
-		repository = new GenericRepository<>();
-		repository.setSession(session);
+    @BeforeEach
+    void setUp() {
+        sessionMock = mock(Session.class);
+        transactionMock = mock(Transaction.class);
+        repository = new GenericRepository<>();
+        repository.setSession(sessionMock);
+    }
 
-		// Insertar datos de prueba dentro de una transacción
-		Transaction transaction = session.beginTransaction();
-		User entity = new User();
-		entity.setPassword("test123");
-		entity.setUserName("test123");
+    @Test
+    void testSaveEntity_Success() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
 
-		Rol rol = new Rol();
-		rol.setName("Admin");
-		List<Rol> roles = new ArrayList<>();
-		roles.add(rol);
-		entity.setRoles(roles);
+        Object result = repository.saveEntity(entity);
 
-		session.persist(rol); // Primero persiste el Rol
-		session.persist(entity);
-		transaction.commit();
-	}
+        verify(sessionMock).persist(entity);
+        verify(transactionMock).commit();
+        assertNotNull(result, "Entity should be saved and returned");
+    }
 
-	@AfterEach
-	void tearDown() {
-		if (session != null) {
-			session.close();
-		}
-	}
+    @Test
+    void testSaveEntity_NullEntity() {
+        Object result = repository.saveEntity(null);
 
-	@Test
-	void testGetEntities() {
-		List<User> entities = repository.getEntities(User.class.getName());
-		assertNotNull(entities);
-		assertFalse(entities.isEmpty());
-		assertEquals(1, entities.size());
-	}
+        verify(sessionMock, never()).beginTransaction();
+        assertNull(result, "Saving a null entity should return null");
+    }
 
-	@Test
-	void testGetEntityById() {
-		// Insertar datos de prueba
-		Transaction transaction = session.beginTransaction();
-		User user = new User();
-		user.setUserName("testuser");
-		user.setPassword("testpassword");
-		session.persist(user);
-		transaction.commit();
+    @Test
+    void testSaveEntity_Exception() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
+        doThrow(new RuntimeException("Error")).when(sessionMock).persist(entity);
 
-		// Recuperar la entidad por ID
-		User retrievedUser = repository.getEntityById(User.class.getName(), user.getId());
+        Object result = repository.saveEntity(entity);
 
-		// Verificar resultados
-		assertNotNull(retrievedUser);
-		assertEquals(user.getUserName(), retrievedUser.getUserName());
-		assertEquals(user.getPassword(), retrievedUser.getPassword());
-	}
+        verify(transactionMock).rollback();
+        assertNull(result, "Entity should not be saved in case of an exception");
+    }
 
-	@Test
-	void testUpdateEntity() {
-		// Insertar datos de prueba
-		Transaction transaction = session.beginTransaction();
-		User user = new User();
-		user.setUserName("testuser");
-		user.setPassword("testpassword");
-		session.persist(user);
-		transaction.commit();
+    @Test
+    void testUpdateEntity_Success() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
 
-		// Actualizar la entidad
-		user.setUserName("updateduser");
-		user.setPassword("updatedpassword");
-		boolean isUpdated = repository.updateEntity(user);
+        boolean result = repository.updateEntity(entity);
 
-		// Verificar resultados
-		assertTrue(isUpdated);
+        verify(sessionMock).merge(entity);
+        verify(transactionMock).commit();
+        assertTrue(result, "Entity should be updated successfully");
+    }
 
-		// Verificar cambios en la base de datos
-		User updatedUser = repository.getEntityById(User.class.getName(), user.getId());
-		assertEquals("updateduser", updatedUser.getUserName());
-		assertEquals("updatedpassword", updatedUser.getPassword());
-	}
+    @Test
+    void testUpdateEntity_NullEntity() {
+        boolean result = repository.updateEntity(null);
 
-	@Test
-	void testDeleteEntity() {
-		// Insertar datos de prueba
-		Transaction transaction = session.beginTransaction();
-		User user = new User();
-		user.setUserName("testuser");
-		user.setPassword("testpassword");
-		session.persist(user);
-		transaction.commit();
+        verify(sessionMock, never()).beginTransaction();
+        assertFalse(result, "Updating a null entity should return false");
+    }
 
-		// Eliminar la entidad
-		boolean isDeleted = repository.deleteEntity(user);
+    @Test
+    void testUpdateEntity_Exception() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
+        doThrow(new RuntimeException("Error")).when(sessionMock).merge(entity);
 
-		// Verificar resultados
-		assertTrue(isDeleted);
+        boolean result = repository.updateEntity(entity);
 
-		// Verificar que la entidad ya no existe en la base de datos
-		User deletedUser = repository.getEntityById(User.class.getName(), user.getId());
-		assertNull(deletedUser);
-	}
+        verify(transactionMock).rollback();
+        assertFalse(result, "Entity should not be updated in case of an exception");
+    }
 
-	@Test
-	void testSaveEntity() {
-		// Crear la entidad a guardar
-		User user = new User();
-		user.setUserName("testuser");
-		user.setPassword("testpassword");
+    @Test
+    void testDeleteEntity_Success() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
 
-		// Guardar la entidad en la base de datos
-		User savedUser = repository.saveEntity(user);
+        boolean result = repository.deleteEntity(entity);
 
-		// Verificar resultados
-		assertNotNull(savedUser);
-		assertNotNull(savedUser.getId()); // ID debe haberse generado
-		assertEquals("testuser", savedUser.getUserName());
-		assertEquals("testpassword", savedUser.getPassword());
+        verify(sessionMock).remove(entity);
+        verify(transactionMock).commit();
+        assertTrue(result, "Entity should be deleted successfully");
+    }
 
-		// Verificar que la entidad realmente existe en la base de datos
-		User retrievedUser = repository.getEntityById(User.class.getName(), savedUser.getId());
-		assertNotNull(retrievedUser);
-		assertEquals(savedUser.getUserName(), retrievedUser.getUserName());
-		assertEquals(savedUser.getPassword(), retrievedUser.getPassword());
-	}
+    @Test
+    void testDeleteEntity_NullEntity() {
+        boolean result = repository.deleteEntity(null);
 
+        verify(sessionMock, never()).beginTransaction();
+        assertFalse(result, "Deleting a null entity should return false");
+    }
+
+    @Test
+    void testDeleteEntity_Exception() {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
+        doThrow(new RuntimeException("Error")).when(sessionMock).remove(entity);
+
+        boolean result = repository.deleteEntity(entity);
+
+        verify(transactionMock).rollback();
+        assertFalse(result, "Entity should not be deleted in case of an exception");
+    }
+
+    @Test
+    void testGetEntityById_Success() throws ClassNotFoundException {
+        Object entity = new Object();
+        when(sessionMock.beginTransaction()).thenReturn(transactionMock);
+        when(sessionMock.get(Object.class, 1)).thenReturn(entity);
+
+        Object result = repository.getEntityById("java.lang.Object", 1);
+
+        verify(transactionMock).commit();
+        assertNotNull(result, "Entity should be fetched successfully");
+    }
+
+    @Test
+    void testGetEntityById_InvalidClass() {
+        assertThrows(RuntimeException.class, () -> {
+            repository.getEntityById("InvalidClass", 1);
+        }, "Invalid class should throw a RuntimeException");
+    }
+
+    @Test
+    void testGetEntities_Success() throws ClassNotFoundException {
+        List<Object> entities = new ArrayList<>();
+        entities.add(new Object());
+        Query<Object> queryMock = mock(Query.class);
+
+        when(sessionMock.createQuery(anyString(), eq(Object.class))).thenReturn(queryMock);
+        when(queryMock.list()).thenReturn(entities);
+
+        List<Object> result = repository.getEntities("java.lang.Object");
+
+        assertNotNull(result, "Result list should not be null");
+        assertEquals(1, result.size(), "Entities list size should match");
+    }
+
+    @Test
+    void testGetEntities_InvalidClass() {
+        List<Object> result = repository.getEntities("InvalidClass");
+
+        assertNotNull(result, "Result list should not be null");
+        assertTrue(result.isEmpty(), "Entities list should be empty for an invalid class");
+    }
 }
+

@@ -1,17 +1,20 @@
 package com.uapa.software;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Container;
+import java.lang.reflect.Method;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.uapa.software.views.ProjectList;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.Container;
-import java.lang.reflect.Method;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectListTest {
 
