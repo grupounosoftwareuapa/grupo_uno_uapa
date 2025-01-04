@@ -110,7 +110,9 @@ public class Login extends JFrame {
 
         // Lógica de inicio de sesión (ejemplo simple)
         if (username.equals("admin") && password.equals("password")) {
-        	
+        	// To be implemented consuming cognito service
+        	new Project().setVisible(true);
+        	this.setVisible(false);
         } else {
             JOptionPane.showMessageDialog(this, "Credenciales incorrectas", "Error", JOptionPane.ERROR_MESSAGE);
         }
