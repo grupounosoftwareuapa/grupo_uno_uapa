@@ -2,6 +2,7 @@ package com.uapa.software.views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class Project extends JFrame {
 
@@ -117,6 +118,11 @@ public class Project extends JFrame {
         footerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         footerPanel.setBackground(new Color(240, 240, 240)); // Light gray background
 
+        JButton btnListProjects = new JButton("List Projects");
+        btnListProjects.setFont(new Font("Arial", Font.BOLD, 14));
+        btnListProjects.addActionListener(this::onListProjects);
+        footerPanel.add(btnListProjects);
+
         JButton btnSave = new JButton("Save");
         btnSave.setFont(new Font("Arial", Font.BOLD, 14));
         footerPanel.add(btnSave);
@@ -126,5 +132,10 @@ public class Project extends JFrame {
         footerPanel.add(btnCancel);
 
         return footerPanel;
+    }
+
+    public void onListProjects(ActionEvent event) {
+        this.dispose();
+        new ProjectList().setVisible(true);
     }
 }

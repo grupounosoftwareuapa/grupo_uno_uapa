@@ -28,16 +28,16 @@ public class Project {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column(name = "name", nullable = false, length = 100)
 	private String name;
-	
+
 	@Column(name = "description", length = 500)
 	private String description;
-	
+
 	@Column(name = "start_date", nullable = false)
 	private Date startDate;
-	
+
 	@Column(name = "end_date", nullable = false)
 	private Date endDate;
 
