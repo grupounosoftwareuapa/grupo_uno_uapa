@@ -13,36 +13,36 @@ import com.uapa.software.models.User;
 
 public class HibernateUtil {
 
-    private static SessionFactory sessionFactory;
+    // private static SessionFactory sessionFactory;
 
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration configuration = new Configuration();
+    // public static SessionFactory getSessionFactory() {
+    // if (sessionFactory == null) {
+    // try {
+    // Configuration configuration = new Configuration();
 
-                Properties settings = new Properties();
-                settings.put(AvailableSettings.DRIVER, "org.postgresql.Driver");
-                settings.put(AvailableSettings.URL, EnvConfig.get("DB_URL"));
-                settings.put(AvailableSettings.USER, EnvConfig.get("DB_USER"));
-                settings.put(AvailableSettings.PASS, EnvConfig.get("DB_PASSWORD"));
-                settings.put(AvailableSettings.DIALECT, "org.hibernate.dialect.H2Dialect");
-                settings.put(AvailableSettings.SHOW_SQL, "true");
-                settings.put(AvailableSettings.HBM2DDL_AUTO, "create-drop");
+    // Properties settings = new Properties();
+    // settings.put(AvailableSettings.DRIVER, "org.postgresql.Driver");
+    // settings.put(AvailableSettings.URL, EnvConfig.get("DB_URL"));
+    // settings.put(AvailableSettings.USER, EnvConfig.get("DB_USER"));
+    // settings.put(AvailableSettings.PASS, EnvConfig.get("DB_PASSWORD"));
+    // settings.put(AvailableSettings.DIALECT, "org.hibernate.dialect.H2Dialect");
+    // settings.put(AvailableSettings.SHOW_SQL, "true");
+    // settings.put(AvailableSettings.HBM2DDL_AUTO, "create-drop");
 
-                configuration.setProperties(settings);
+    // configuration.setProperties(settings);
 
-                // Registra tus clases anotadas
-                configuration.addAnnotatedClass(Project.class);
-                configuration.addAnnotatedClass(Task.class);
-                configuration.addAnnotatedClass(User.class);
-                configuration.addAnnotatedClass(Rol.class);
+    // // Registra tus clases anotadas
+    // configuration.addAnnotatedClass(Project.class);
+    // configuration.addAnnotatedClass(Task.class);
+    // configuration.addAnnotatedClass(User.class);
+    // configuration.addAnnotatedClass(Rol.class);
 
-                sessionFactory = configuration.buildSessionFactory();
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Error creando la SessionFactory para pruebas");
-            }
-        }
-        return sessionFactory;
-    }
+    // sessionFactory = configuration.buildSessionFactory();
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // throw new RuntimeException("Error creando la SessionFactory para pruebas");
+    // }
+    // }
+    // return sessionFactory;
+    // }
 }
